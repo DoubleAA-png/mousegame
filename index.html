@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#dceaf3" />
+    <title>Mousegame</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app" id="app" data-theme="blue">
+      <header class="topbar">
+        <button class="brand" id="home-button" type="button" aria-label="Mousegame home">
+          <svg class="brand__cursor" viewBox="0 0 32 40" aria-hidden="true">
+            <path d="M5 3v27l7-7 5 12 5-2-5-11 10-1L5 3Z" />
+          </svg>
+          <span>mousegame</span>
+        </button>
+        <div class="topbar__actions">
+          <button class="nav-button" id="top-levels-button" type="button">Levels</button>
+          <button class="nav-button" id="progress-button" type="button">Progress</button>
+          <button class="nav-button" id="controls-button" type="button">Controls</button>
+          <button class="icon-button" id="settings-button" type="button" aria-label="Settings" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" />
+              <path d="m19.3 13.8 1 .8-1.6 2.8-1.2-.5a7.8 7.8 0 0 1-1.8 1l-.2 1.3h-3.2l-.2-1.3a7.8 7.8 0 0 1-1.8-1l-1.2.5-1.6-2.8 1-.8a7.7 7.7 0 0 1 0-2l-1-.8 1.6-2.8 1.2.5a7.8 7.8 0 0 1 1.8-1l.2-1.3h3.2l.2 1.3a7.8 7.8 0 0 1 1.8 1l1.2-.5 1.6 2.8-1 .8a7.7 7.7 0 0 1 0 2Z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="screen screen--home" id="home-screen" aria-labelledby="home-title">
+        <div class="home-art" aria-hidden="true">
+          <svg class="home-art__cursor" viewBox="0 0 120 148">
+            <path d="M18 12v105l27-27 20 43 20-9-20-43 38-3L18 12Z" />
+          </svg>
+          <span class="home-art__trail home-art__trail--one"></span>
+          <span class="home-art__trail home-art__trail--two"></span>
+          <span class="home-art__trail home-art__trail--three"></span>
+        </div>
+        <div class="home-copy">
+          <p class="eyebrow">A tiny test of steady hands</p>
+          <h1 id="home-title">Mouse<span>game</span></h1>
+          <p class="home-copy__line">Find the way. Mind the red.</p>
+          <button class="button button--primary button--large" id="play-button" type="button">
+            Play <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="screen level-screen" id="levels-screen" aria-labelledby="levels-title" hidden>
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">Your progress</p>
+            <h1 id="levels-title">Choose a level</h1>
+          </div>
+          <span class="progress-count" id="progress-count">1 / 20 unlocked</span>
+        </div>
+        <div class="level-grid" id="level-grid" aria-label="Levels"></div>
+        <button class="text-button" id="levels-home-button" type="button">← Home</button>
+      </section>
+
+      <section class="screen game-screen" id="game-screen" aria-labelledby="game-title" hidden>
+        <div class="game-heading">
+          <button class="text-button" id="game-levels-button" type="button">← Levels</button>
+          <div class="game-heading__title">
+              <p class="eyebrow" id="difficulty-label">Warm up</p>
+            <h1 id="game-title">Level <span id="current-level">1</span></h1>
+          </div>
+          <button class="icon-button" id="restart-button" type="button" aria-label="Restart level">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 11a8 8 0 0 0-14.9-3L3 11m0-6v6h6M4 13a8 8 0 0 0 14.9 3L21 13m0 6v-6h-6" />
+            </svg>
+          </button>
+        </div>
+        <div class="game-stats" aria-live="polite">
+          <span>Time <strong id="timer">00:00</strong></span>
+          <span>Deaths <strong id="deaths">0</strong></span>
+          <span class="key-counter" id="key-counter" hidden>Keys <strong id="keys-collected">0 / 0</strong></span>
+          <span>Best <strong id="best-time">--:--</strong></span>
+          <span class="game-stats__hint">Stay inside the path</span>
+        </div>
+        <div class="game-stage" id="game-stage">
+          <canvas id="maze-canvas" width="1000" height="560" tabindex="0" aria-label="Maze. Move your cursor from the start to the finish. Collect keys, avoid red walls, and dodge moving hazards."></canvas>
+          <div class="game-message game-message--ready" id="ready-message">
+            <span class="message-icon" aria-hidden="true">↗</span>
+            <span>Move to the start</span>
+          </div>
+          <div class="game-message game-message--win" id="win-message" hidden>
+            <span class="win-star" aria-hidden="true">✦</span>
+            <h2 id="win-title">Nice work!</h2>
+            <p id="win-copy">Level cleared</p>
+            <button class="button button--primary" id="complete-button" type="button">Complete &amp; continue →</button>
+            <button class="text-button" id="win-levels-button" type="button">Back to levels</button>
+          </div>
+        </div>
+        <div class="obstacle-legend" aria-label="Obstacle guide">
+          <span><i class="legend-mark legend-mark--orb"></i>Orb</span>
+          <span><i class="legend-mark legend-mark--sweeper"></i>Sweeper</span>
+          <span><i class="legend-mark legend-mark--spinner"></i>Spinner</span>
+          <span><i class="legend-mark legend-mark--diamond"></i>Phase shard</span>
+          <span><i class="legend-mark legend-mark--pulse"></i>Pulse</span>
+          <span class="obstacle-legend__door">Gold doors need keys</span>
+        </div>
+        <p class="game-footnote" id="game-footnote">Move with your mouse, WASD, or arrow keys.</p>
+      </section>
+
+      <dialog class="settings" id="settings-dialog" aria-labelledby="settings-title">
+        <div class="settings__top">
+          <div>
+            <p class="eyebrow">Make it yours</p>
+            <h2 id="settings-title">Settings</h2>
+          </div>
+          <button class="icon-button settings__close" id="close-settings" type="button" aria-label="Close settings">×</button>
+        </div>
+        <fieldset class="theme-picker">
+          <legend>Theme</legend>
+          <div class="theme-picker__choices">
+            <button type="button" class="theme-choice" data-theme-choice="blue" aria-pressed="true">
+              <span class="theme-swatch theme-swatch--blue"></span>Sky
+            </button>
+            <button type="button" class="theme-choice" data-theme-choice="forest" aria-pressed="false">
+              <span class="theme-swatch theme-swatch--forest"></span>Forest
+            </button>
+            <button type="button" class="theme-choice" data-theme-choice="plum" aria-pressed="false">
+              <span class="theme-swatch theme-swatch--plum"></span>Plum
+            </button>
+            <button type="button" class="theme-choice" data-theme-choice="sunset" aria-pressed="false">
+              <span class="theme-swatch theme-swatch--sunset"></span>Sunset
+            </button>
+          </div>
+        </fieldset>
+        <fieldset class="theme-picker cosmetic-picker">
+          <legend>Cursor</legend>
+          <div class="theme-picker__choices theme-picker__choices--three">
+            <button type="button" class="theme-choice" data-cursor-style="classic" aria-pressed="true">Classic</button>
+            <button type="button" class="theme-choice" data-cursor-style="neon" aria-pressed="false">Neon</button>
+            <button type="button" class="theme-choice" data-cursor-style="mono" aria-pressed="false">Mono</button>
+          </div>
+        </fieldset>
+        <fieldset class="theme-picker cosmetic-picker">
+          <legend>Screen effect</legend>
+          <div class="theme-picker__choices theme-picker__choices--three">
+            <button type="button" class="theme-choice" data-screen-effect="none" aria-pressed="true">Off</button>
+            <button type="button" class="theme-choice" data-screen-effect="rgb" aria-pressed="false">RGB pulse</button>
+            <button type="button" class="theme-choice" data-screen-effect="mono" aria-pressed="false">B/W pulse</button>
+          </div>
+        </fieldset>
+        <fieldset class="theme-picker cosmetic-picker">
+          <legend>Background pattern</legend>
+          <div class="theme-picker__choices theme-picker__choices--three">
+            <button type="button" class="theme-choice" data-backdrop="plain" aria-pressed="false">Plain</button>
+            <button type="button" class="theme-choice" data-backdrop="dots" aria-pressed="true">Dots</button>
+            <button type="button" class="theme-choice" data-backdrop="grid" aria-pressed="false">Grid</button>
+          </div>
+        </fieldset>
+        <label class="settings__option settings__option--guide" for="show-trail">
+          <span>Cursor trail</span>
+          <input id="show-trail" type="checkbox" checked />
+          <span class="settings__switch" aria-hidden="true"></span>
+        </label>
+        <label class="settings__option settings__option--guide" for="show-guide">
+          <span>Show path guide</span>
+          <input id="show-guide" type="checkbox" checked />
+          <span class="settings__switch" aria-hidden="true"></span>
+        </label>
+        <label class="settings__option" for="reduced-motion">
+          <span>Reduce motion</span>
+          <input id="reduced-motion" type="checkbox" />
+          <span class="settings__switch" aria-hidden="true"></span>
+        </label>
+      </dialog>
+      <dialog class="settings utility-dialog" id="progress-dialog" aria-labelledby="progress-title">
+        <div class="settings__top">
+          <div>
+            <p class="eyebrow">Your runs</p>
+            <h2 id="progress-title">Progress</h2>
+          </div>
+          <button class="icon-button" id="close-progress" type="button" aria-label="Close progress">×</button>
+        </div>
+        <dl class="progress-stats">
+          <div><dt>Levels cleared</dt><dd id="progress-cleared">0 / 20</dd></div>
+          <div><dt>Fastest clear</dt><dd id="progress-best">--:--</dd></div>
+          <div><dt>Total deaths</dt><dd id="progress-hits">0</dd></div>
+        </dl>
+        <button class="button button--primary utility-dialog__action" id="progress-levels-button" type="button">Choose a level →</button>
+      </dialog>
+      <dialog class="settings utility-dialog" id="controls-dialog" aria-labelledby="controls-title">
+        <div class="settings__top">
+          <div>
+            <p class="eyebrow">Move your cursor</p>
+            <h2 id="controls-title">Controls</h2>
+          </div>
+          <button class="icon-button" id="close-controls" type="button" aria-label="Close controls">×</button>
+        </div>
+        <dl class="controls-list">
+          <div><dt>Mouse</dt><dd>Move or drag across the maze</dd></div>
+          <div><dt>Keyboard</dt><dd>Hold WASD or arrow keys to glide</dd></div>
+          <div><dt>Goal</dt><dd>Stay on the path, collect keys, reach the green exit</dd></div>
+        </dl>
+      </dialog>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
